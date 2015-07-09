@@ -56,6 +56,15 @@
 	<build>
 		<finalName>Evolutionary-Computing-System-GP</finalName>
 		<testSourceDirectory>src/main/test</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>trainingdata.txt</include>
+					<include>settings.properties</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 
 			<!-- download source code in Eclipse, best practice -->
@@ -93,6 +102,8 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<includes>
+							</includes>
 							<transformers>
 								<!-- add Main-Class to manifest file -->
 								<transformer
