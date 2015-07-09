@@ -1,4 +1,4 @@
-package test;
+package data;
 
 import data.OperandNode;
 import data.OperatorNode;
