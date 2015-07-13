@@ -1,13 +1,9 @@
 package data;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class TrainingData {
@@ -29,29 +25,6 @@ public class TrainingData {
 
 	public double outputData() {
 		return outputData;
-	}
-
-	public static void generateInitialTrainingData(double minValue,
-			int dataSetSize) throws Exception {
-
-		FileOutputStream outputStream = new FileOutputStream(TRAINING_FILE_NAME);
-
-		DataOutputStream out = new DataOutputStream(outputStream);
-
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
-
-		for (int i = 0; i < dataSetSize; i++) {
-			double x = minValue;
-			// double y = ((x * x) - 1)/2;
-			double y = ((-3 * (x * x)) + 7) / 2;
-
-			bw.write("" + x + "," + y + "\n");
-
-			minValue++;
-		}
-
-		bw.flush();
-		bw.close();
 	}
 
 	// public static void generateInitialTrainingDataOriginal(double minValue,

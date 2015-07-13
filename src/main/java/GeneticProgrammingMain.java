@@ -113,7 +113,6 @@ public class GeneticProgrammingMain {
 
 	private void showGUI() {
 		SwingUtilities.invokeLater(new Runnable() {
-			@Override
 			public void run() {
 				GeneticProgrammingMain.output.createAndShowDashboard();
 			}

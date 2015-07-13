@@ -1,142 +1,157 @@
 package data;
 
-import utilities.Settings;
-import utilities.Utilities;
-
 import java.util.ArrayList;
 import java.util.Properties;
 
-public class GeneticProgrammingTree extends Tree implements Comparable<GeneticProgrammingTree> {
+import utilities.Settings;
+import utilities.Utilities;
 
-    private double fitness;
+public class GeneticProgrammingTree extends Tree implements
+		Comparable<GeneticProgrammingTree> {
 
-    private GeneticProgrammingTree(Node root, double fitness) {
-        super(root);
-        setFitness(fitness);
-    }
+	private double fitness;
 
-    public double getFitness() {
-        return fitness;
-    }
+	private GeneticProgrammingTree(Node root, double fitness) {
+		super(root);
+		setFitness(fitness);
+	}
 
-    public void setFitness(double fitness) {
-        this.fitness = fitness;
-    }
+	public double getFitness() {
+		return fitness;
+	}
 
-    public static ArrayList<GeneticProgrammingTree> getGeneticTreePopulation(int size) throws Exception {
-        ArrayList<GeneticProgrammingTree> population = new ArrayList<GeneticProgrammingTree>(size);
-        boolean singletonExists = false;
-        int i = 0;
-        while (i < size) {
-            GeneticProgrammingTree gpTree = GeneticProgrammingTree.createGeneticProgrammingTree(TrainingData.getTrainingData());
+	public void setFitness(double fitness) {
+		this.fitness = fitness;
+	}
 
-            if (gpTree.depth() == 1) {
-                if (singletonExists) {
-                    continue;
-                } else {
-                    if (gpTree.exists(new OperandNode(OperandNode.OPERAND_X))) {
-                        population.add(gpTree);
-                        i++;
+	public static ArrayList<GeneticProgrammingTree> getGeneticTreePopulation(
+			int size) throws Exception {
+		ArrayList<GeneticProgrammingTree> population = new ArrayList<GeneticProgrammingTree>(
+				size);
+		boolean singletonExists = false;
+		int i = 0;
+		while (i < size) {
+			GeneticProgrammingTree gpTree = GeneticProgrammingTree
+					.createGeneticProgrammingTree(TrainingData
+							.getTrainingData());
 
-                        singletonExists = true;
+			if (gpTree.depth() == 1) {
+				if (singletonExists) {
+					continue;
+				} else {
+					if (gpTree.exists(new OperandNode(OperandNode.OPERAND_X))) {
+						population.add(gpTree);
+						i++;
 
-                        if (Settings.trace()) {
-                            Utilities.printTreeNode(gpTree.getRoot());
-                        }
-                    }
-                }
-            } else {
-                if (gpTree.exists(new OperandNode(OperandNode.OPERAND_X))) {
-                    population.add(gpTree);
-                    i++;
+						singletonExists = true;
 
-                    if (Settings.trace()) {
-                        Utilities.printTreeNode(gpTree.getRoot());
-                    }
-                } else {
-                    continue;
-                }
-            }
-        }
+						if (Settings.trace()) {
+							Utilities.printTreeNode(gpTree.getRoot());
+						}
+					}
+				}
+			} else {
+				if (gpTree.exists(new OperandNode(OperandNode.OPERAND_X))) {
+					population.add(gpTree);
+					i++;
 
-        return population;
-    }
+					if (Settings.trace()) {
+						Utilities.printTreeNode(gpTree.getRoot());
+					}
+				} else {
+					continue;
+				}
+			}
+		}
 
-    public static GeneticProgrammingTree createGeneticProgrammingTree(ArrayList<TrainingData> trainingDataList) throws Exception {
-        Properties settings = Settings.getSettings();
+		return population;
+	}
 
-        String prop = settings.getProperty(Settings.PROP_MAX_DEPTH);
+	public static GeneticProgrammingTree createGeneticProgrammingTree(
+			ArrayList<TrainingData> trainingDataList) throws Exception {
+		Properties settings = Settings.getSettings();
 
-        int maxDepth = Integer.parseInt(prop);
+		String prop = settings.getProperty(Settings.PROP_MAX_DEPTH);
 
-        return createGeneticProgrammingTree(trainingDataList, maxDepth);
-    }
+		int maxDepth = Integer.parseInt(prop);
 
-    public static GeneticProgrammingTree createGeneticProgrammingTree(ArrayList<TrainingData> trainingDataList, int maxDepth) throws Exception {
-        Tree tree = generateInitialTree(maxDepth);
+		return createGeneticProgrammingTree(trainingDataList, maxDepth);
+	}
 
-        double fitness = evaluateFitness(trainingDataList, tree);
+	public static GeneticProgrammingTree createGeneticProgrammingTree(
+			ArrayList<TrainingData> trainingDataList, int maxDepth)
+			throws Exception {
+		Tree tree = generateInitialTree(maxDepth);
 
-        return new GeneticProgrammingTree(tree.getRoot(), fitness);
-    }
-    
-    public static GeneticProgrammingTree copy(GeneticProgrammingTree tree) throws Exception {
-        Tree copyTree = Tree.copy(tree);
-        
-        return new GeneticProgrammingTree(copyTree.getRoot(), tree.getFitness());
-    }
+		double fitness = evaluateFitness(trainingDataList, tree);
 
-    public static double evaluateFitness(ArrayList<TrainingData> trainingDataList, Tree tree) throws Exception {
-        double fitness = 0;
+		return new GeneticProgrammingTree(tree.getRoot(), fitness);
+	}
 
-        for (TrainingData trainingData : trainingDataList) {
-            double evalData = tree.evaluate(trainingData.inputData);
+	public static GeneticProgrammingTree copy(GeneticProgrammingTree tree)
+			throws Exception {
+		Tree copyTree = Tree.copy(tree);
 
-            if (Settings.trace()) {
-                System.out.println("Evaluate tree(" + trainingData.inputData + "): " + evalData);
-            }
+		return new GeneticProgrammingTree(copyTree.getRoot(), tree.getFitness());
+	}
 
-            fitness = fitness + Math.abs(trainingData.outputData - evalData);
+	public static double evaluateFitness(
+			ArrayList<TrainingData> trainingDataList, Tree tree)
+			throws Exception {
+		double fitness = 0;
 
-            if (Settings.trace()) {
-                System.out.println("Tree Fitness : Math.abs(" + trainingData.outputData + " - " + evalData + ") = " + fitness);
-            }
-        }
-        return fitness;
-    }
+		for (TrainingData trainingData : trainingDataList) {
+			double evalData = tree.evaluate(trainingData.inputData);
 
-    public static void updateFitness(GeneticProgrammingTree tree, ArrayList<TrainingData> trainingDataList) throws Exception {
+			if (Settings.trace()) {
+				System.out.println("Evaluate tree(" + trainingData.inputData
+						+ "): " + evalData);
+			}
 
-        if (tree != null && trainingDataList.size() > 0) {
-            double fitness = evaluateFitness(trainingDataList, tree);
-            
-            tree.setFitness(fitness);
-        }
-    }
+			fitness = fitness + Math.abs(trainingData.outputData - evalData);
 
-    public static Tree generateInitialTree(int maxDepth) throws Exception {
-        Tree tree = null;
-        do {
-            tree = Tree.generateTree(maxDepth);
-        } while (Double.isNaN(tree.evaluate(0)) || Double.isInfinite(tree.evaluate(0)));
+			if (Settings.trace()) {
+				System.out.println("Tree Fitness : Math.abs("
+						+ trainingData.outputData + " - " + evalData + ") = "
+						+ fitness);
+			}
+		}
+		return fitness;
+	}
 
-        if (Settings.trace()) {
-            System.out.println("Evaluate for x=0: " + tree.evaluate(0));
-        }
+	public static void updateFitness(GeneticProgrammingTree tree,
+			ArrayList<TrainingData> trainingDataList) throws Exception {
 
-        return tree;
-    }
+		if (tree != null && trainingDataList.size() > 0) {
+			double fitness = evaluateFitness(trainingDataList, tree);
 
-    @Override
+			tree.setFitness(fitness);
+		}
+	}
+
+	public static Tree generateInitialTree(int maxDepth) throws Exception {
+		Tree tree = null;
+		do {
+			tree = Tree.generateTree(maxDepth);
+		} while (Double.isNaN(tree.evaluate(0))
+				|| Double.isInfinite(tree.evaluate(0)));
+
+		if (Settings.trace()) {
+			System.out.println("Evaluate for x=0: " + tree.evaluate(0));
+		}
+
+		return tree;
+	}
+
 	public int compareTo(GeneticProgrammingTree gpTree) {
-        double delta = this.fitness - gpTree.getFitness();
+		double delta = this.fitness - gpTree.getFitness();
 
-        if (delta > 0) {
-            return 1;
-        } else if (delta == 0) {
-            return 0;
-        } else {
-            return -1;
-        }
-    }
+		if (delta > 0) {
+			return 1;
+		} else if (delta == 0) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
 }

@@ -12,7 +12,7 @@
 		<jdk.version>1.7</jdk.version>
 		<jodatime.version>2.5</jodatime.version>
 		<junit.version>4.11</junit.version>
-		<powermock.version>1.6.2</powermock.version>
+		<powermock.version>1.5.1</powermock.version>
 	</properties>
 	<dependencies>
 
@@ -77,7 +77,16 @@
 					<downloadJavadocs>false</downloadJavadocs>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.codehaus.sonar</groupId>
+				<artifactId>sonar-packaging-maven-plugin</artifactId>
+				<version>1.12.1</version>
+				<extensions>true</extensions>
+				<configuration>
+					<pluginClass>org.sonar.samples.java.MyJavaRulesPlugin</pluginClass>
+				</configuration>
+			</plugin>
+			
 			<!-- Set a compiler level -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

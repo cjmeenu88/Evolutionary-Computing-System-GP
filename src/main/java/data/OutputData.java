@@ -1,16 +1,7 @@
 package data;
 
 import java.awt.BasicStroke;
-/*
- import org.jfree.chart.ChartFactory;
- import org.jfree.chart.ChartPanel;
- import org.jfree.chart.ChartUtilities;
- import org.jfree.chart.JFreeChart;
- import org.jfree.chart.plot.PlotOrientation;
- import org.jfree.data.xy.XYSeries;
- import org.jfree.data.xy.XYSeriesCollection;
- import utilities.Utilities;
- */
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -46,15 +37,18 @@ public class OutputData {
 
 	private JFreeChart chart = null;
 	private JFreeChart chart2 = null;
+	private JFreeChart chart3 = null;
 	private JFrame topFrame = null;
 	private JPanel mainPanel = null;
-	private ChartPanel cp = null;
-	private ChartPanel cp2 = null;
+	private ChartPanel chartpanel1 = null;
 	private JPanel results = null;
 	private JTextArea textArea = null;
 
-	private volatile XYSeries series = new XYSeries("f(x)");
-	private volatile XYSeries series2 = new XYSeries("f(x)");
+	private volatile XYSeries series = new XYSeries("f(x) Real Funtion");
+	private volatile XYSeries series2 = new XYSeries("f(x) Target Function");
+	private volatile XYSeries series3 = new XYSeries(
+			"Fittest Generation In Each Tree");
+	private volatile XYSeries series4 = new XYSeries("Final Population/Fitness");
 
 	public void setStartTime(long time) {
 		startTime = time;
@@ -91,31 +85,12 @@ public class OutputData {
 		printResults();
 		updateDashboard();
 		printSeperatorLine();
-		// displyTrainingDataGraph();
+		if (generationCount < 100 || generationCount > 10000) {
+			generateBestFitnessGenerationChart();
+		}
+		// if(generationCount > 900)
+		// generateBestFitnessGenerationChart();
 	}
-
-	//
-	// public void displyTrainingDataGraph() throws Exception{
-	// XYSeries series = new XYSeries("x/f(x)");
-	//
-	// for (TrainingData trainingData : TrainingData.getTrainingData()) {
-	// series.add(trainingData.inputData, trainingData.outputData);
-	// }
-	//
-	// XYSeriesCollection dataset = new XYSeriesCollection();
-	// dataset.addSeries(series);
-	//
-	// chart2 = ChartFactory.createXYLineChart(
-	// "x/f(x)",
-	// "x",
-	// "y",
-	// dataset,
-	// PlotOrientation.VERTICAL,
-	// true,
-	// true,
-	// false
-	// );
-	// }
 
 	public void displayPopulation(ArrayList<GeneticProgrammingTree> population) {
 		int index = 0;
@@ -156,7 +131,7 @@ public class OutputData {
 
 		int gen = 0;
 		for (GeneticProgrammingTree gpTree : fittestTreeInEachGeneration) {
-			series.add(gen, gpTree.getFitness());
+			series3.add(gen, gpTree.getFitness());
 			++gen;
 		}
 
@@ -173,8 +148,15 @@ public class OutputData {
 				true, // Use tool tips
 				false // Generate URLs
 				);
+		ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setPreferredSize(new java.awt.Dimension(560, 367));
+		final XYPlot plot1 = chart.getXYPlot();
+		XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
+		renderer1.setSeriesPaint(0, Color.GREEN);
+		renderer1.setSeriesStroke(0, new BasicStroke(8.0f));
+		plot1.setRenderer(renderer1);
 
-		ChartUtilities.saveChartAsJPEG(new File("bestfitness_generation.jpg"),
+		ChartUtilities.saveChartAsJPEG(new File("best_fitness_generation.jpg"),
 				chart, 1500, 900);
 	}
 
@@ -199,7 +181,7 @@ public class OutputData {
 
 		int t = 0;
 		for (GeneticProgrammingTree gpTree : population) {
-			series.add(t, gpTree.getFitness());
+			series4.add(t, gpTree.getFitness());
 			++t;
 		}
 
@@ -209,6 +191,14 @@ public class OutputData {
 		JFreeChart chart = ChartFactory
 				.createXYLineChart(title, "Tree", "Fitness", dataset,
 						PlotOrientation.VERTICAL, true, true, false);
+
+		ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setPreferredSize(new java.awt.Dimension(560, 367));
+		final XYPlot plot1 = chart.getXYPlot();
+		XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
+		renderer1.setSeriesPaint(0, Color.RED);
+		renderer1.setSeriesStroke(1, new BasicStroke(9.0f));
+		plot1.setRenderer(renderer1);
 
 		ChartUtilities.saveChartAsJPEG(new File(fileName + ".jpg"), chart,
 				1500, 900);
@@ -229,6 +219,11 @@ public class OutputData {
 		JFreeChart chart2 = ChartFactory.createXYLineChart("x/f(x)", "x", "y",
 				dataset, PlotOrientation.VERTICAL, true, true, false);
 
+		final XYPlot plot1 = chart2.getXYPlot();
+		XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
+		renderer1.setSeriesPaint(0, Color.BLUE);
+		renderer1.setSeriesStroke(1, new BasicStroke(7.0f));
+		plot1.setRenderer(renderer1);
 		ChartUtilities.saveChartAsJPEG(new File("xy_graph.jpg"), chart2, 1500,
 				900);
 
@@ -248,20 +243,26 @@ public class OutputData {
 	public void createAndShowDashboard() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		dataset.addSeries(series);
-		dataset.addSeries(series2);
 
 		XYSeriesCollection dataset2 = new XYSeriesCollection();
-		dataset2.addSeries(series2);
+		dataset2.addSeries(series3);
+
+		XYSeriesCollection dataset3 = new XYSeriesCollection();
+		dataset3.addSeries(series2);
 
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		topFrame = new JFrame("Genetic Programming System");
 
 		mainPanel = new JPanel();
-		GridLayout layout = new GridLayout(0, 1);
+		GridLayout layout = new GridLayout(1, 2);
 
 		layout.setVgap(11);
 		mainPanel.setLayout(layout);
 
+		JPanel mainPanel2 = new JPanel();
+
+		BorderLayout bLayout = new BorderLayout();
+		mainPanel2.setLayout(bLayout);
 		results = new JPanel();
 
 		textArea = new JTextArea(9, 80);
@@ -276,12 +277,13 @@ public class OutputData {
 		topFrame.setResizable(true);
 		topFrame.setVisible(true);
 
-		chart2 = ChartFactory.createXYLineChart("f(x) Target Fuctions", "x",
-				"y", dataset2, PlotOrientation.VERTICAL, true, true, false);
+		chart2 = ChartFactory.createXYLineChart(
+				"Fittes Tree In Each Generation", "Generation", "Fittest Tree",
+				dataset2, PlotOrientation.VERTICAL, true, true, false);
 
 		final XYPlot plot = chart2.getXYPlot();
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-		renderer.setSeriesPaint(0, Color.BLUE);
+		renderer.setSeriesPaint(0, Color.GREEN);
 		renderer.setSeriesStroke(0, new BasicStroke(4.0f));
 		plot.setRenderer(renderer);
 
@@ -290,20 +292,30 @@ public class OutputData {
 
 		final XYPlot plot1 = chart.getXYPlot();
 		XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
-		renderer1.setSeriesPaint(0, Color.BLUE);
-		renderer1.setSeriesPaint(0, Color.GREEN);
-		renderer1.setSeriesStroke(0, new BasicStroke(4.0f));
-		renderer1.setSeriesStroke(1, new BasicStroke(6.0f));
+		renderer1.setSeriesPaint(0, Color.red);
+		renderer1.setSeriesStroke(2, new BasicStroke(6.0f));
 		plot1.setRenderer(renderer1);
 
-		ChartPanel cp2 = new ChartPanel(chart2);
-		// cp2.setPreferredSize( new java.awt.Dimension( 560 , 367 ));
-		cp = new ChartPanel(chart);
+		chart3 = ChartFactory.createXYLineChart("f(x) Target Function", "x",
+				"y", dataset3, PlotOrientation.VERTICAL, true, true, false);
 
-		mainPanel.add(cp2);
-		mainPanel.add(cp);
-		mainPanel.add(results);
-		topFrame.getContentPane().add(mainPanel);
+		final XYPlot plot2 = chart3.getXYPlot();
+		XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer();
+		renderer2.setSeriesPaint(0, Color.BLUE);
+		renderer2.setSeriesStroke(2, new BasicStroke(6.0f));
+		plot2.setRenderer(renderer2);
+
+		ChartPanel chartpanel2 = new ChartPanel(chart2);
+		ChartPanel chartpanel3 = new ChartPanel(chart3);
+		chartpanel1 = new ChartPanel(chart);
+
+		mainPanel.add(chartpanel3);
+		mainPanel.add(chartpanel1);
+		mainPanel.add(chartpanel2);
+
+		mainPanel2.add(mainPanel, BorderLayout.NORTH);
+		mainPanel2.add(results, BorderLayout.SOUTH);
+		topFrame.getContentPane().add(mainPanel2);
 	}
 
 	public void updateDashboard() throws Exception {
