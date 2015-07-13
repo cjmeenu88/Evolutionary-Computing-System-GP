@@ -117,7 +117,7 @@
 								<!-- add Main-Class to manifest file -->
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.ust.seis.ec.App</mainClass>
+									<mainClass>GeneticProgrammingMain</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

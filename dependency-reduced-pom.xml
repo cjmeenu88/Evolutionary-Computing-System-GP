@@ -57,7 +57,7 @@
               <includes />
               <transformers>
                 <transformer>
-                  <mainClass>com.ust.seis.ec.App</mainClass>
+                  <mainClass>GeneticProgrammingMain</mainClass>
                 </transformer>
               </transformers>
             </configuration>
